@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="guitoofw">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/guitoofw.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/guitoofw.jar!/" />
+    </SOURCES>
+  </library>
+</component>
