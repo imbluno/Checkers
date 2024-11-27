@@ -107,14 +107,13 @@ public class Game {
         return false;
     }
     private boolean isValidPosition(int line, int column){
-        return line >= 0
-                && column >= 0
-                && line < BOARD_SIZE
-                && column < BOARD_SIZE;
+        return line >= 0 && column >= 0 && line < BOARD_SIZE && column < BOARD_SIZE; // verifica se a posição está dentro do tabuleiro
     }
 
     private boolean isValidMove(int line, int column) {
-        //WIP
+        if (isValidPosition(line, column)) {
+            //cenas
+        }
         return true;
     }
 
