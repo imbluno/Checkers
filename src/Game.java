@@ -35,7 +35,15 @@ public class Game {
             return new Coordinates[]{new Coordinates(pos.line() - 1, pos.column() - 1)};
         } else if (pos.status() == WHITE && pos.line() - 1 >= 0){ // se for uma peça branca, existir espaço no tabuleiro em cima e existir espaço de ambos os lados
             return new Coordinates[]{new Coordinates(pos.line() - 1, pos.column() - 1), new Coordinates(pos.line() - 1, pos.column() + 1)};
-        }
+        } else if (pos.status() == BLACK && pos.line() + 1 < BOARD_SIZE && pos.column() - 1 < 0){ // se for uma peça preta, existir espaço no tabuleiro abaixo e não existir espaço à esquerda
+            return new Coordinates[]{new Coordinates(pos.line() + 1, pos.column() + 1)};
+        } else if (pos.status() == BLACK && pos.line() + 1 < BOARD_SIZE && pos.column() + 1 > BOARD_SIZE){ // se for uma peça preta, existir espaço no tabuleiro abaixo e não existir espaço à direita
+            return new Coordinates[]{new Coordinates(pos.line() + 1, pos.column() - 1)};
+        } else if (pos.status() == BLACK && pos.line() + 1 < BOARD_SIZE){ // se for uma peça preta, existir espaço no tabuleiro abaixo e existir espaço de ambos os lados
+            return new Coordinates[]{new Coordinates(pos.line() + 1, pos.column() - 1), new Coordinates(pos.line() + 1, pos.column() + 1)};
+        } else
+            return null;
+
     }
 
     private void initializeBoard() {
