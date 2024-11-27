@@ -32,7 +32,11 @@ public class View {
 
     void click(int line, int column){
         Position compare = model.getBoardPosition(line, column);
-        if(model.)
+
+    }
+
+    void movement(Position move){
+
     }
 
     Color background(int line, int column){

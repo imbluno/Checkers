@@ -28,6 +28,16 @@ public class Game {
         return board[line][column];
     }
 
+    public Coordinates[] getDiagonals(Position pos){
+        if (pos.status() == WHITE && pos.line() - 1 >= 0 && pos.column() - 1 < 0){ // se for uma peça branca, existir espaço no tabuleiro em cima e não existir espaço à esquerda
+            return new Coordinates[]{new Coordinates(pos.line() - 1, pos.column() + 1)};
+        } else if (pos.status() == WHITE && pos.line() - 1 >= 0 && pos.column() + 1 > BOARD_SIZE){ // se for uma peça branca, existir espaço no tabuleiro em cima e não existir espaço à direita
+            return new Coordinates[]{new Coordinates(pos.line() - 1, pos.column() - 1)};
+        } else if (pos.status() == WHITE && pos.line() - 1 >= 0){ // se for uma peça branca, existir espaço no tabuleiro em cima e existir espaço de ambos os lados
+            return new Coordinates[]{new Coordinates(pos.line() - 1, pos.column() - 1), new Coordinates(pos.line() - 1, pos.column() + 1)};
+        }
+    }
+
     private void initializeBoard() {
         // colocar as peças nas posições iniciais
         int blackPieces = PIECE_AMOUNT;
@@ -115,6 +125,8 @@ public class Game {
         }
         return false;
     }
+
+
 
     private boolean isValidMove(Position start, Position end){
         boolean diagMove = Math.abs(start.column() - end.column()) == 1; // diferença de 1 coluna - movimento na diagonal
