@@ -9,8 +9,12 @@ public class Game {
     public static final int WHITE = 2;
     // número de peças por jogador
     private static final int PIECE_AMOUNT = 12;
-    // criação de matriz de posições, em que cada posição vai ter as coordenadas da própria posição e o status da mesma (EMPTY, BLACK, WHITE) ficando do tipo Position[line][col] = new Position (line, col, status)
+    // criação de matriz com as posições no tabuleiro de jogo
     final int[][] board = new int[BOARD_SIZE][BOARD_SIZE];
+
+    public int getBoardSize(){
+        return BOARD_SIZE;
+    }
 
     public void getEmptyBoard() {
         for (int i = 0; i < BOARD_SIZE; i++) {
@@ -21,10 +25,6 @@ public class Game {
 
             }
         }
-    }
-
-    public int getBoardSize(){
-        return BOARD_SIZE;
     }
 
     public void initializeBoard() {
@@ -43,7 +43,7 @@ public class Game {
         }
         // colocar as peças brancas no tabuleiro
         for (int i = BOARD_SIZE - 1; i >= 0; i--) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
+            for (int j = BOARD_SIZE - 1 ; j >= 0; j--) {
                 if(isBlackTile(i,j) && whitePieces > 0) { // se for uma casa branca e ainda houver peças brancas disponíveis, coloca uma peça branca no lugar
                     this.board[i][j] = WHITE;
                     whitePieces--;
@@ -64,7 +64,8 @@ public class Game {
             line % 2 == 0 // linhas pares
                 &&
             column % 2 == 1 // colunas ímpares
-            ) ||
+            )
+                ||
             (
             line % 2 == 1 // linhas ímpares
                 &&

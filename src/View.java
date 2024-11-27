@@ -9,7 +9,7 @@ public class View {
 
     View(Game model){
         this.model = model;
-        board = new Board("Teste", model.getBoardSize(), model.getBoardSize(), 80);
+        board = new Board("Teste", model.getBoardSize(), model.getBoardSize(), 50);
         board.setIconProvider(this::icon);
         board.addMouseListener(this::click);
         board.setBackgroundProvider(this::background);
