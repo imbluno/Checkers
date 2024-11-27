@@ -15,7 +15,10 @@ public class Game {
     public void getEmptyBoard() {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                this.board[i][j] = EMPTY;
+                if(isBlackTile(i, j)) {
+                    this.board[i][j] = EMPTY;
+                }
+
             }
         }
     }
