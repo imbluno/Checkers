@@ -9,7 +9,7 @@ public class Game {
     private static final int WHITE = 2;
     // número de peças por jogador
     private static final int PIECE_AMOUNT = 12;
-    // criação de matriz de posições, em que cada posição vai ter as coordenadas da própria posição e o status da mesma (EMPTY, BLACK, WHITE)
+    // criação de matriz de posições, em que cada posição vai ter as coordenadas da própria posição e o status da mesma (EMPTY, BLACK, WHITE) ficando do tipo Position[line][col] = new Position (line, col, status)
     private final Position[][] board = new Position[BOARD_SIZE][BOARD_SIZE];
 
     private void getEmptyBoard() {
@@ -20,23 +20,30 @@ public class Game {
         }
     }
 
+    public int getBoardSize(){
+        return BOARD_SIZE;
+    }
+
     private void initializeBoard() {
         // colocar as peças nas posições iniciais
         int blackPieces = PIECE_AMOUNT;
         int whitePieces = PIECE_AMOUNT;
+
         // colocar as peças pretas no tabuleiro
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                if(isBlackTile(this.board[i][j])) {
+                if(isBlackTile(this.board[i][j]) && blackPieces > 0) { // se for uma casa preta e ainda houver peças pretas disponíveis, coloca uma peça preta no lugar
                     this.board[i][j] = new Position(i, j, BLACK);
+                    blackPieces--;
                 }
             }
         }
         // colocar as peças brancas no tabuleiro
         for (int i = BOARD_SIZE - 1; i >= 0; i--) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                if(isBlackTile(this.board[i][j])) {
+                if(isBlackTile(this.board[i][j]) && whitePieces > 0) { // se for uma casa branca e ainda houver peças brancas disponíveis, coloca uma peça branca no lugar
                     this.board[i][j] = new Position(i, j, WHITE);
+                    whitePieces--;
                 }
             }
         }
@@ -49,32 +56,27 @@ public class Game {
         this.blackTurn = !this.blackTurn;
     }
 
-    private boolean isBlackTile(Position position) {
-        if (
-                (
-                        position.line() % 2 == 0 // linhas pares
-                                &&
-                                position.column() % 2 == 1 // colunas ímpares
-                ) ||
-                        (
-                                position.line() % 2 == 1 // linhas impares
-                                        &&
-                                        position.column() % 2 == 0 // colunas pares
-                        )
-        ) {
-            return true;
-        }
-        return false;
+    public boolean isBlackTile(Position position) {
+        return (
+            position.line() % 2 == 0 // linhas pares
+                &&
+            position.column() % 2 == 1 // colunas ímpares
+            ) ||
+            (
+            position.line() % 2 == 1 // linhas ímpares
+                &&
+            position.column() % 2 == 0 // colunas pares
+            );
     }
-    private boolean isEmptyTile(Position position){
+    public boolean isEmptyTile(Position position){
         return position.status() == EMPTY;
     }
 
-    private boolean hasWhitePiece(Position position){
+    public boolean hasWhitePiece(Position position){
         return position.status() == WHITE;
     }
 
-    private boolean hasBlackPiece(Position position){
+    public boolean hasBlackPiece(Position position){
         return position.status() == BLACK;
     }
 
@@ -85,24 +87,24 @@ public class Game {
         Position blackRightDiag = new Position(start.line() + 1, start.column() + 1, BLACK);
 
         if(
-                start.status() == BLACK // peça inicial é preta
-                        &&
-                        (
-                                end.status() == whiteRightDiag.status() // existe uma peça branca na diagonal à direita
-                                        ||
-                                        end.status() == whiteLeftDiag.status() // existe uma peça branca na diagonal à esquerda
-                        )
+            start.status() == BLACK // peça inicial é preta
+                &&
+                (
+                        end.status() == whiteRightDiag.status() // existe uma peça branca na diagonal à direita
+                            ||
+                        end.status() == whiteLeftDiag.status() // existe uma peça branca na diagonal à esquerda
+                )
         )
         {
             return true;
         } else if(
-                start.status() == WHITE // peça inicial é branca
-                        &&
-                        (
-                                end.status() == blackRightDiag.status() // existe uma peça preta na diagonal à direita
-                                        ||
-                                        end.status() == blackLeftDiag.status() // existe uma peça preta na diagonal à esquerda
-                        )
+            start.status() == WHITE // peça inicial é branca
+                &&
+                (
+                        end.status() == blackRightDiag.status() // existe uma peça preta na diagonal à direita
+                            ||
+                        end.status() == blackLeftDiag.status() // existe uma peça preta na diagonal à esquerda
+                )
         )
         {
             return true;
@@ -118,23 +120,23 @@ public class Game {
             // validar movimentos das peças brancas - brancas só movem para cima
                 (
                         hasWhitePiece(start) // verifica se é peça branca
-                                &&
-                                isEmptyTile(end) // posição de destino está vazia
-                                &&
-                                diagMove
-                                &&
-                                end.line() - start.line() == 1 // linha maior 1 unidade que linha inicial, movimento sempre para cima
+                            &&
+                        isEmptyTile(end) // posição de destino está vazia
+                            &&
+                        diagMove
+                            &&
+                        end.line() - start.line() == 1 // linha maior 1 unidade que linha inicial, movimento sempre para cima
                 ) ||
-                        // validar movimentos das peças pretas - pretas só movem para baixo
-                        (
-                                hasBlackPiece(start) // verifica se é peça preta
-                                        &&
-                                        isEmptyTile(end) // posição de destino está vazia
-                                        &&
-                                        diagMove
-                                        &&
-                                        end.line() - start.line() == -1 // linha menor 1 unidade que linha inicial, movimento sempre para baixo
-                        )
+            // validar movimentos das peças pretas - pretas só movem para baixo
+                (
+                        hasBlackPiece(start) // verifica se é peça preta
+                            &&
+                        isEmptyTile(end) // posição de destino está vazia
+                            &&
+                        diagMove
+                            &&
+                        end.line() - start.line() == -1 // linha menor 1 unidade que linha inicial, movimento sempre para baixo
+                )
 
         ) {
             return true;

@@ -1,4 +1,49 @@
+import pt.iscte.guitoo.Color;
+import pt.iscte.guitoo.StandardColor;
+import pt.iscte.guitoo.board.Board;
+
 public class View {
+
+    Game model;
+    Board board;
+
+    View(Game model){
+        this.model = model;
+        board = new Board("Teste", model.getBoardSize(), model.getBoardSize(), 80);
+        board.setIconProvider(this::icon);
+        board.addMouseListener(this::click);
+        board.setBackgroundProvider(this::background);
+        board.addAction("random", this::random);
+        board.addAction("new", this::newBoard);
+    }
+
+    String icon(int line, int column){
+
+    }
+
+    void click(int line, int column){
+
+    }
+
+    Color background(int line, int column){
+
+    }
+
+    void newBoard(){
+
+    }
+
+    void random(){
+
+    }
+
+    void start(){
+
+    }
+
+
+
+
     public static void main(String[] args) {
 
     }
