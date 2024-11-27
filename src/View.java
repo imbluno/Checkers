@@ -20,10 +20,9 @@ public class View {
     }
 
     String icon(int line, int column){
-        Position compare = model.getBoardPosition(line, column);
-        if(compare.status() == Game.WHITE){
+        if(model.board[line][column] == Game.WHITE){
             return "white.png";
-        } else if(compare.status() == Game.BLACK){
+        } else if(model.board[line][column] == Game.BLACK){
             return "black.png";
         } else {
             return null;
@@ -31,16 +30,14 @@ public class View {
     }
 
     void click(int line, int column){
-        Position compare = model.getBoardPosition(line, column);
-
-    }
-
-    void movement(Position move){
 
     }
 
     Color background(int line, int column){
-
+        if(model.isBlackTile(line, column)){
+            return StandardColor.BLACK;
+        } else
+            return StandardColor.WHITE;
     }
 
     void newBoard(){
@@ -60,13 +57,16 @@ public class View {
     }
 
     void start(){
-
+        board.open();
+        model.getEmptyBoard();
+        model.initializeBoard();
     }
 
 
 
 
     public static void main(String[] args) {
-
+        View gui = new View(new Game());
+        gui.start();
     }
 }

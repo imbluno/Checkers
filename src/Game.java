@@ -10,12 +10,12 @@ public class Game {
     // número de peças por jogador
     private static final int PIECE_AMOUNT = 12;
     // criação de matriz de posições, em que cada posição vai ter as coordenadas da própria posição e o status da mesma (EMPTY, BLACK, WHITE) ficando do tipo Position[line][col] = new Position (line, col, status)
-    private final Position[][] board = new Position[BOARD_SIZE][BOARD_SIZE];
+    final int[][] board = new int[BOARD_SIZE][BOARD_SIZE];
 
-    private void getEmptyBoard() {
+    public void getEmptyBoard() {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                this.board[i][j] = new Position(i, j, EMPTY);
+                this.board[i][j] = EMPTY;
             }
         }
     }
@@ -24,29 +24,7 @@ public class Game {
         return BOARD_SIZE;
     }
 
-    public Position getBoardPosition(int line, int column){
-        return board[line][column];
-    }
-
-    public Coordinates[] getDiagonals(Position pos){
-        if (pos.status() == WHITE && pos.line() - 1 >= 0 && pos.column() - 1 < 0){ // se for uma peça branca, existir espaço no tabuleiro em cima e não existir espaço à esquerda
-            return new Coordinates[]{new Coordinates(pos.line() - 1, pos.column() + 1)};
-        } else if (pos.status() == WHITE && pos.line() - 1 >= 0 && pos.column() + 1 > BOARD_SIZE){ // se for uma peça branca, existir espaço no tabuleiro em cima e não existir espaço à direita
-            return new Coordinates[]{new Coordinates(pos.line() - 1, pos.column() - 1)};
-        } else if (pos.status() == WHITE && pos.line() - 1 >= 0){ // se for uma peça branca, existir espaço no tabuleiro em cima e existir espaço de ambos os lados
-            return new Coordinates[]{new Coordinates(pos.line() - 1, pos.column() - 1), new Coordinates(pos.line() - 1, pos.column() + 1)};
-        } else if (pos.status() == BLACK && pos.line() + 1 < BOARD_SIZE && pos.column() - 1 < 0){ // se for uma peça preta, existir espaço no tabuleiro abaixo e não existir espaço à esquerda
-            return new Coordinates[]{new Coordinates(pos.line() + 1, pos.column() + 1)};
-        } else if (pos.status() == BLACK && pos.line() + 1 < BOARD_SIZE && pos.column() + 1 > BOARD_SIZE){ // se for uma peça preta, existir espaço no tabuleiro abaixo e não existir espaço à direita
-            return new Coordinates[]{new Coordinates(pos.line() + 1, pos.column() - 1)};
-        } else if (pos.status() == BLACK && pos.line() + 1 < BOARD_SIZE){ // se for uma peça preta, existir espaço no tabuleiro abaixo e existir espaço de ambos os lados
-            return new Coordinates[]{new Coordinates(pos.line() + 1, pos.column() - 1), new Coordinates(pos.line() + 1, pos.column() + 1)};
-        } else
-            return null;
-
-    }
-
-    private void initializeBoard() {
+    public void initializeBoard() {
         // colocar as peças nas posições iniciais
         int blackPieces = PIECE_AMOUNT;
         int whitePieces = PIECE_AMOUNT;
@@ -54,8 +32,8 @@ public class Game {
         // colocar as peças pretas no tabuleiro
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                if(isBlackTile(this.board[i][j]) && blackPieces > 0) { // se for uma casa preta e ainda houver peças pretas disponíveis, coloca uma peça preta no lugar
-                    this.board[i][j] = new Position(i, j, BLACK);
+                if(isBlackTile(i,j) && blackPieces > 0) { // se for uma casa preta e ainda houver peças pretas disponíveis, coloca uma peça preta no lugar
+                    this.board[i][j] = BLACK;
                     blackPieces--;
                 }
             }
@@ -63,8 +41,8 @@ public class Game {
         // colocar as peças brancas no tabuleiro
         for (int i = BOARD_SIZE - 1; i >= 0; i--) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                if(isBlackTile(this.board[i][j]) && whitePieces > 0) { // se for uma casa branca e ainda houver peças brancas disponíveis, coloca uma peça branca no lugar
-                    this.board[i][j] = new Position(i, j, WHITE);
+                if(isBlackTile(i,j) && whitePieces > 0) { // se for uma casa branca e ainda houver peças brancas disponíveis, coloca uma peça branca no lugar
+                    this.board[i][j] = WHITE;
                     whitePieces--;
                 }
             }
@@ -78,54 +56,49 @@ public class Game {
         this.blackTurn = !this.blackTurn;
     }
 
-    public boolean isBlackTile(Position position) {
+    public boolean isBlackTile(int line, int column) {
         return (
-            position.line() % 2 == 0 // linhas pares
+            line % 2 == 0 // linhas pares
                 &&
-            position.column() % 2 == 1 // colunas ímpares
+            column % 2 == 1 // colunas ímpares
             ) ||
             (
-            position.line() % 2 == 1 // linhas ímpares
+            line % 2 == 1 // linhas ímpares
                 &&
-            position.column() % 2 == 0 // colunas pares
+            column % 2 == 0 // colunas pares
             );
     }
-    public boolean isEmptyTile(Position position){
-        return position.status() == EMPTY;
+    public boolean isEmptyTile(int line, int column) {
+        return board[line][column] == EMPTY;
     }
 
-    public boolean hasWhitePiece(Position position){
-        return position.status() == WHITE;
+    public boolean hasWhitePiece(int line, int column){
+        return board[line][column] == WHITE;
     }
 
-    public boolean hasBlackPiece(Position position){
-        return position.status() == BLACK;
+    public boolean hasBlackPiece(int line, int column){
+        return board[line][column] == BLACK;
     }
 
-    private boolean hasToCapture(Position start, Position end){
-        Position whiteLeftDiag = new Position(start.line() - 1, start.column()- 1, WHITE);
-        Position whiteRightDiag = new Position(start.line() - 1, start.column() + 1, WHITE);
-        Position blackLeftDiag = new Position(start.line() + 1, start.column() - 1, BLACK);
-        Position blackRightDiag = new Position(start.line() + 1, start.column() + 1, BLACK);
-
+    private boolean hasToCapture(int line, int column){
         if(
-            start.status() == BLACK // peça inicial é preta
+            board[line][column] == BLACK // peça inicial é preta
                 &&
                 (
-                        end.status() == whiteRightDiag.status() // existe uma peça branca na diagonal à direita
+                        board[line - 1][column + 1] == WHITE // existe uma peça branca na diagonal à direita
                             ||
-                        end.status() == whiteLeftDiag.status() // existe uma peça branca na diagonal à esquerda
+                        board[line - 1][column - 1] == WHITE // existe uma peça branca na diagonal à esquerda
                 )
         )
         {
             return true;
         } else if(
-            start.status() == WHITE // peça inicial é branca
+                board[line][column] == WHITE // peça inicial é branca
                 &&
                 (
-                        end.status() == blackRightDiag.status() // existe uma peça preta na diagonal à direita
+                        board[line + 1][column + 1] == BLACK // existe uma peça preta na diagonal à direita
                             ||
-                        end.status() == blackLeftDiag.status() // existe uma peça preta na diagonal à esquerda
+                        board[line + 1][column - 1] == BLACK // existe uma peça preta na diagonal à esquerda
                 )
         )
         {
@@ -133,39 +106,16 @@ public class Game {
         }
         return false;
     }
+    private boolean isValidPosition(int line, int column){
+        return line >= 0
+                && column >= 0
+                && line < BOARD_SIZE
+                && column < BOARD_SIZE;
+    }
 
-
-
-    private boolean isValidMove(Position start, Position end){
-        boolean diagMove = Math.abs(start.column() - end.column()) == 1; // diferença de 1 coluna - movimento na diagonal
-        boolean captureMoveLeft = start.column() - end.column() == 2;
-        boolean captureMoveRight = start.column() - end.column() == -2;
-        if (
-            // validar movimentos das peças brancas - brancas só movem para cima
-                (
-                        hasWhitePiece(start) // verifica se é peça branca
-                            &&
-                        isEmptyTile(end) // posição de destino está vazia
-                            &&
-                        diagMove
-                            &&
-                        end.line() - start.line() == 1 // linha maior 1 unidade que linha inicial, movimento sempre para cima
-                ) ||
-            // validar movimentos das peças pretas - pretas só movem para baixo
-                (
-                        hasBlackPiece(start) // verifica se é peça preta
-                            &&
-                        isEmptyTile(end) // posição de destino está vazia
-                            &&
-                        diagMove
-                            &&
-                        end.line() - start.line() == -1 // linha menor 1 unidade que linha inicial, movimento sempre para baixo
-                )
-
-        ) {
-            return true;
-        } else
-            return false;
+    private boolean isValidMove(int line, int column) {
+        //WIP
+        return true;
     }
 
 
