@@ -18,7 +18,14 @@ public class View {
     }
 
     String icon(int line, int column){
-
+        Position compare = model.getBoardPosition(line, column);
+        if(compare.status() == Game.WHITE){
+            return "white.png";
+        } else if(compare.status() == Game.BLACK){
+            return "black.png";
+        } else {
+            return null;
+        }
     }
 
     void click(int line, int column){

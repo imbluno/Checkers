@@ -2,11 +2,11 @@ public class Game {
     // tamanho do tabuleiro
     private static final int BOARD_SIZE = 8;
     // valor para quando o espaço está vazio
-    private static final int EMPTY = 0;
+    public static final int EMPTY = 0;
     // valor para quando existe uma peça preta na posição
-    private static final int BLACK = 1;
+    public static final int BLACK = 1;
     // valor para quando existe uma peça branca na posição
-    private static final int WHITE = 2;
+    public static final int WHITE = 2;
     // número de peças por jogador
     private static final int PIECE_AMOUNT = 12;
     // criação de matriz de posições, em que cada posição vai ter as coordenadas da própria posição e o status da mesma (EMPTY, BLACK, WHITE) ficando do tipo Position[line][col] = new Position (line, col, status)
@@ -22,6 +22,10 @@ public class Game {
 
     public int getBoardSize(){
         return BOARD_SIZE;
+    }
+
+    public Position getBoardPosition(int line, int column){
+        return board[line][column];
     }
 
     private void initializeBoard() {
