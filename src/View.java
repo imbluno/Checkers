@@ -15,6 +15,8 @@ public class View {
         board.setBackgroundProvider(this::background);
         board.addAction("random", this::random);
         board.addAction("new", this::newBoard);
+        board.addAction("save", this::saveStatus);
+        board.addAction("load", this::loadStatus);
     }
 
     String icon(int line, int column){
@@ -29,7 +31,8 @@ public class View {
     }
 
     void click(int line, int column){
-
+        Position compare = model.getBoardPosition(line, column);
+        if(model.)
     }
 
     Color background(int line, int column){
@@ -37,6 +40,14 @@ public class View {
     }
 
     void newBoard(){
+
+    }
+
+    void saveStatus(){
+
+    }
+
+    void loadStatus(){
 
     }
 
