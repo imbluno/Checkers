@@ -110,15 +110,24 @@ public class Game {
         }
         return false;
     }
-    private boolean isValidPosition(int line, int column){
+    public boolean isValidPosition(int line, int column){
         return line >= 0 && column >= 0 && line < BOARD_SIZE && column < BOARD_SIZE; // verifica se a posição está dentro do tabuleiro
     }
+    // brancas só andam na diagonal para cima
+    // pretas só andam na diagonal para baixo
+    // peças não podem andar na vertical e na horizontal
+    // se existir uma peça a capturar, tem que ser capturada obrigatoriamente
+    public int[] isValidMove(int line, int column) {
 
-    private boolean isValidMove(int line, int column) {
         if (isValidPosition(line, column)) {
-            //cenas
+            if (board[line][column] == WHITE) { // verifica se a peça é branca;
+                return null;
+
+            } else if (board[line][column] == BLACK) { // verifica se a peça é preta
+                return null;
+            }
         }
-        return true;
+        return null;
     }
 
 

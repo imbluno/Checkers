@@ -29,8 +29,14 @@ public class View {
         }
     }
 
-    void click(int line, int column){
+    private boolean control = false;
 
+    private void click(int line, int column){
+        if(!control){
+            if(model.isValidPosition(line, column)){
+                int[] availableMoves = model.isValidMove(line, column);
+            }
+        }
     }
 
     Color background(int line, int column){
@@ -41,7 +47,8 @@ public class View {
     }
 
     void newBoard(){
-
+        View gui = new View(new Game());
+        gui.start();
     }
 
     void saveStatus(){
