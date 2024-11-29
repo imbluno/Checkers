@@ -11,7 +11,7 @@ public class View {
         this.model = model;
         board = new Board("Teste", model.getBoardSize(), model.getBoardSize(), 50);
         board.setIconProvider(this::icon);
-        board.addMouseListener(this::click);
+        board.addMouseListener((line, column) -> click(line, column));
         board.setBackgroundProvider(this::background);
         board.addAction("random", this::random);
         board.addAction("new", this::newBoard);
@@ -30,20 +30,32 @@ public class View {
     }
 
     private boolean control = false;
-
+    private int startLine = 0;
+    private int startColumn = 0;
     private void click(int line, int column){
         if(!control){
-            if(model.isValidPosition(line, column)){
-                int[] availableMoves = model.isValidMove(line, column);
+            if(model.getValidMoves(line, column)){
+                control = true;
+                startLine = line;
+                startColumn = column;
             }
+        } else if (control){
+            model.movePiece(startLine, startColumn, line, column);
+            control = false;
         }
     }
 
     Color background(int line, int column){
         if(model.isBlackTile(line, column)){
             return StandardColor.BLACK;
-        } else
+        } else if (!model.isBlackTile(line, column)){
             return StandardColor.WHITE;
+        } else if (model.getValidMoves(line, column)){
+            return StandardColor.AQUA;
+        } else if (!model.isBlackTile(line, column)){
+            return StandardColor.RED;
+        }
+        return null;
     }
 
     void newBoard(){
