@@ -117,14 +117,16 @@ public class Game {
     // pretas só andam na diagonal para baixo
     // peças não podem andar na vertical e na horizontal
     // se existir uma peça a capturar, tem que ser capturada obrigatoriamente
-    public boolean isValidMove(int line, int column) {
+    public boolean isValidMove(int startLine, int startColumn, int endLine, int endColumn) {
 
-        if (isValidPosition(line, column)) {
-            if (board[line][column] == WHITE) { // verifica se a peça é branca;
+        if (isValidPosition(startLine, startColumn) && isValidPosition(endLine, endColumn)) {
+            if (board[startLine][startColumn] == WHITE) { // verifica se a peça é branca;
+                if(startLine - endLine == 1 && Math.abs(startColumn - endColumn) == 1) {
+                    return true;
+                }
 
-
-            } else if (board[line][column] == BLACK) { // verifica se a peça é preta
-                if(line + 1 < BOARD_SIZE) {
+            } else if (board[startLine][startColumn] == BLACK) { // verifica se a peça é preta
+                if(startLine + 1 < BOARD_SIZE) {
                     return true;
                 }
             }

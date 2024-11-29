@@ -7,11 +7,14 @@ public class View {
     Game model;
     Board board;
 
+    private int startLine = 0;
+    private int startColumn = 0;
+
     View(Game model){
         this.model = model;
         board = new Board("Teste", model.getBoardSize(), model.getBoardSize(), 50);
         board.setIconProvider(this::icon);
-        board.addMouseListener((line, column) -> click(line, column));
+        board.addMouseListener(this::click);
         board.setBackgroundProvider(this::background);
         board.addAction("random", this::random);
         board.addAction("new", this::newBoard);
@@ -28,32 +31,25 @@ public class View {
             return null;
         }
     }
-
     private boolean control = false;
-    private int startLine = 0;
-    private int startColumn = 0;
+
     private void click(int line, int column){
-        if(!control){
-            if(model.getValidMoves(line, column)){
-                control = true;
+        if(!(this.control)){
+                this.control = true;
                 startLine = line;
                 startColumn = column;
             }
-        } else if (control){
-            model.movePiece(startLine, startColumn, line, column);
-            control = false;
+        else if (this.control){
+            model.movePiece(this.startLine, this.startColumn, line, column);
+            this.control = false;
         }
     }
 
-    Color background(int line, int column){
+    private Color background(int line, int column){
         if(model.isBlackTile(line, column)){
             return StandardColor.BLACK;
         } else if (!model.isBlackTile(line, column)){
             return StandardColor.WHITE;
-        } else if (model.getValidMoves(line, column)){
-            return StandardColor.AQUA;
-        } else if (!model.isBlackTile(line, column)){
-            return StandardColor.RED;
         }
         return null;
     }
