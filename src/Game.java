@@ -135,7 +135,13 @@ public class Game {
     }
 
     public void movePiece(int startLine, int startColumn, int endLine, int endColumn) {
-
+        if (board[startLine][startColumn] == WHITE) {
+            board[endLine][endLine] = WHITE;
+            board[startLine][startColumn] = EMPTY;
+        } else if (board[startLine][startColumn] == BLACK) {
+            board[endLine][endLine] = BLACK;
+            board[startLine][startColumn] = EMPTY;
+        }
     }
 
 
