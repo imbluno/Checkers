@@ -10,9 +10,10 @@ public class View {
     private int startLine = 0;
     private int startColumn = 0;
 
+
     View(Game model){
         this.model = model;
-        board = new Board("Teste", model.getBoardSize(), model.getBoardSize(), 50);
+        board = new Board(getTurn, model.getBoardSize(), model.getBoardSize(), 50);
         board.setIconProvider(this::icon);
         board.addMouseListener(this::click);
         board.setBackgroundProvider(this::background);
@@ -20,6 +21,7 @@ public class View {
         board.addAction("new", this::newBoard);
         board.addAction("save", this::saveStatus);
         board.addAction("load", this::loadStatus);
+        board.refresh();
     }
 
     String icon(int line, int column){
@@ -33,14 +35,26 @@ public class View {
     }
     private boolean control = false;
 
+    private String getTurn = model.isBlackTurn() ? "Vez das peças pretas" : "Vez das peças brancas";
+    private void updateTurn() {
+        board.setTitle(getTurn);
+    }
     private void click(int line, int column){
         if(!(this.control)){
+            if (model.isBlackTurn() && model.board[line][column] == Game.BLACK) { // jogada das peças pretas
+                this.control = true;
+                startLine = line;
+                startColumn = column;
+            } else if (!model.isBlackTurn() && model.board[line][column] == Game.WHITE) { // jogada das peças brancas
                 this.control = true;
                 startLine = line;
                 startColumn = column;
             }
+            }
         else if (this.control){
             model.movePiece(this.startLine, this.startColumn, line, column);
+            model.changeTurn();
+            updateTurn();
             this.control = false;
         }
     }
