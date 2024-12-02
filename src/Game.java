@@ -18,6 +18,10 @@ public class Game {
         return BOARD_SIZE;
     }
 
+    public int getBoardPosition(int line , int column){
+        return 0;
+    }
+
     public void getEmptyBoard() {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -90,62 +94,63 @@ public class Game {
         return board[line][column] == BLACK;
     }
 
-    private boolean hasToCapture(int line, int column){
-        if(
-            board[line][column] == BLACK // peça inicial é preta
-                &&
-                (
-                        board[line - 1][column + 1] == WHITE // existe uma peça branca na diagonal à direita
-                            ||
-                        board[line - 1][column - 1] == WHITE // existe uma peça branca na diagonal à esquerda
-                )
-        )
-        {
-            return true;
-        } else if(
-                board[line][column] == WHITE // peça inicial é branca
-                &&
-                (
-                        board[line + 1][column + 1] == BLACK // existe uma peça preta na diagonal à direita
-                            ||
-                        board[line + 1][column - 1] == BLACK // existe uma peça preta na diagonal à esquerda
-                )
-        )
-        {
-            return true;
-        }
-        return false;
-    }
     public boolean isValidPosition(int line, int column){
         return line >= 0 && column >= 0 && line < BOARD_SIZE && column < BOARD_SIZE; // verifica se a posição está dentro do tabuleiro
     }
 
     // peças não podem andar na vertical e na horizontal
     // se existir uma peça a capturar, tem que ser capturada obrigatoriamente
+    private boolean hasToCapture(int line, int column){
+        if(
+                board[line][column] == BLACK // peça inicial é preta
+                        &&
+                        (
+                                board[line - 1][column + 1] == WHITE // existe uma peça branca na diagonal à direita
+                                        ||
+                                        board[line - 1][column - 1] == WHITE // existe uma peça branca na diagonal à esquerda
+                        )
+        )
+        {
+            return true;
+        } else if(
+                board[line][column] == WHITE // peça inicial é branca
+                        &&
+                        (
+                                board[line + 1][column + 1] == BLACK // existe uma peça preta na diagonal à direita
+                                        ||
+                                        board[line + 1][column - 1] == BLACK // existe uma peça preta na diagonal à esquerda
+                        )
+        )
+        {
+            return true;
+        }
+        return false;
+    }
+
     public boolean isValidMove(int startLine, int startColumn, int endLine, int endColumn) {
-        if (isValidPosition(startLine, startColumn) && isValidPosition(endLine, endColumn)) {
+        if (isValidPosition(startLine, startColumn) && isValidPosition(endLine, endColumn)) { // valida as posições
             int piece = board[startLine][startColumn];
             if (piece == WHITE) {  // brancas só andam na diagonal para cima
-                if (endLine == startLine - 1 && Math.abs(endColumn - startColumn) == 1 && isEmptyTile(endLine, endColumn)) {
+                if (endLine == startLine - 1 && Math.abs(endColumn - startColumn) == 1 && isEmptyTile(endLine, endColumn)) { // verifica que a posição final é 1 diagonal acima
                     return true;
                 }
                 // condição para as brancas capturarem
-                else if (endLine == startLine - 2 && Math.abs(endColumn - startColumn) == 2) {
-                    int middleLine = (startLine + endLine) / 2;
-                    int middleColumn = (startColumn + endColumn) / 2;
-                    if (hasBlackPiece(middleLine, middleColumn) && isEmptyTile(endLine, endColumn)) {
+                else if (endLine == startLine - 2 && Math.abs(endColumn - startColumn) == 2) { // verifica que a posição final é 2 diagonais acima
+                    int middleLine = (startLine + endLine) / 2; // divisão inteira das linhas para encontrar a linha no meio
+                    int middleColumn = (startColumn + endColumn) / 2; // divisão inteira das colunas para encontrar a coluna no meio
+                    if (hasBlackPiece(middleLine, middleColumn) && isEmptyTile(endLine, endColumn)) { // verifica que existe uma peça oponente na posição do meio e uma posição vazia na diagonal seguinte
                         return true;
                     }
                 }
             } else if (piece == BLACK) {  // pretas só andam na diagonal para baixo
-                if (endLine == startLine + 1 && Math.abs(endColumn - startColumn) == 1 && isEmptyTile(endLine, endColumn)) {
+                if (endLine == startLine + 1 && Math.abs(endColumn - startColumn) == 1 && isEmptyTile(endLine, endColumn)) { // verifica que a posição final é 1 diagonal abaixo
                     return true;
                 }
                 // condição para as pretas capturarem
-                else if (endLine == startLine + 2 && Math.abs(endColumn - startColumn) == 2) {
-                    int middleLine = (startLine + endLine) / 2;
-                    int middleColumn = (startColumn + endColumn) / 2;
-                    if (hasWhitePiece(middleLine, middleColumn) && isEmptyTile(endLine, endColumn)) {
+                else if (endLine == startLine + 2 && Math.abs(endColumn - startColumn) == 2) { // verifica que a posição final é 2 diagonais abaixo
+                    int middleLine = (startLine + endLine) / 2; // divisão inteira das linhas para encontrar a linha no meio
+                    int middleColumn = (startColumn + endColumn) / 2; // divisão inteira das colunas para encontrar a coluna no meio
+                    if (hasWhitePiece(middleLine, middleColumn) && isEmptyTile(endLine, endColumn)) { // verifica que existe uma peça oponente na posição do meio e uma posição vazia na diagonal seguinte
                         return true;
                     }
                 }
@@ -159,26 +164,19 @@ public class Game {
         if (isValidPosition(startLine, startColumn) && isValidPosition(endLine, endColumn) && isValidMove(startLine, startColumn, endLine, endColumn)) {
             // movimento normal
             if (Math.abs(startLine - endLine) == 1 && Math.abs(startColumn - endColumn) == 1) {
-                board[endLine][endColumn] = board[startLine][startColumn];
-                board[startLine][startColumn] = EMPTY;
+                board[endLine][endColumn] = board[startLine][startColumn]; // move a peça jogada
+                board[startLine][startColumn] = EMPTY; // substitui a posição inicial por EMPTY (vazio)
             }
             // movimento de captura de peça
-            else if (Math.abs(startLine - endLine) == 2 && Math.abs(startColumn - endColumn) == 2) {
+            else if (Math.abs(startLine - endLine) == 2 && Math.abs(startColumn - endColumn) == 2  && hasToCapture(startLine, startColumn)) {
                 int middleLine = (startLine + endLine) / 2;
                 int middleColumn = (startColumn + endColumn) / 2;
                 // atualizar o tabuleiro, retirando a peça capturada
-                board[middleLine][middleColumn] = EMPTY;
-                board[endLine][endColumn] = board[startLine][startColumn];
-                board[startLine][startColumn] = EMPTY;
+                board[middleLine][middleColumn] = EMPTY; // retira a peça capturada
+                board[endLine][endColumn] = board[startLine][startColumn]; // move a peça jogada
+                board[startLine][startColumn] = EMPTY;// substitui a posição inicial por EMPTY (vazio)
             }
         }
     }
-
-
-
-
-
-
-
 
 }

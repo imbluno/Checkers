@@ -13,7 +13,7 @@ public class View {
 
     View(Game model){
         this.model = model;
-        board = new Board(getTurn, model.getBoardSize(), model.getBoardSize(), 50);
+        board = new Board(getTurn(), model.getBoardSize(), model.getBoardSize(), 50);
         board.setIconProvider(this::icon);
         board.addMouseListener(this::click);
         board.setBackgroundProvider(this::background);
@@ -35,9 +35,15 @@ public class View {
     }
     private boolean control = false;
 
-    private String getTurn = model.isBlackTurn() ? "Vez das peças pretas" : "Vez das peças brancas";
     private void updateTurn() {
-        board.setTitle(getTurn);
+        board.setTitle(getTurn().toString());
+    }
+    private String getTurn(){
+        if (model.isBlackTurn()){
+            return "Vez das peças pretas";
+        } else {
+            return "Vez das peças brancas";
+        }
     }
     private void click(int line, int column){
         if(!(this.control)){
@@ -51,7 +57,7 @@ public class View {
                 startColumn = column;
             }
             }
-        else if (this.control){
+        else {
             model.movePiece(this.startLine, this.startColumn, line, column);
             model.changeTurn();
             updateTurn();
