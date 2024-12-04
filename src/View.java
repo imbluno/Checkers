@@ -10,6 +10,7 @@ public class View {
     private int startLine = 0;
     private int startColumn = 0;
 
+
     View(Game model){
         this.model = model;
         board = new Board(getTurn(), model.getBoardSize(), model.getBoardSize(), 50);
@@ -22,6 +23,21 @@ public class View {
         board.addAction("load", this::loadStatus);
         board.refresh();
     }
+
+    String icon(int line, int column){
+        if(model.board[line][column] == Game.WHITE){
+            return "white.png";
+        } else if(model.board[line][column] == Game.BLACK){
+            return "black.png";
+        } else {
+            return null;
+        }
+    }
+    private boolean control = false;
+
+    public void updateTurn() {
+        board.setTitle(getTurn());
+    }
     private String getTurn(){
         if (model.isBlackTurn()){
             return "Vez das peças pretas";
@@ -29,82 +45,59 @@ public class View {
             return "Vez das peças brancas";
         }
     }
-
-    // Define the icon for each square on the board
-    String icon(int line, int column){
-        if(model.board[line][column] == Game.EMPTY){
-            return null;
-        }
-        else if(model.board[line][column] == Game.BLACK){
-            return "black.png"; // white's turn
-        }
+    private void click(int line, int column){
+        if(!(this.control)){
+            if (model.isBlackTurn() && model.board[line][column] == Game.BLACK) { // jogada das peças pretas
+                this.control = true;
+                startLine = line;
+                startColumn = column;
+            } else if (!model.isBlackTurn() && model.board[line][column] == Game.WHITE) { // jogada das peças brancas
+                this.control = true;
+                startLine = line;
+                startColumn = column;
+            }
+            }
         else {
-            return "white.png"; // black's turn
+            model.movePiece(this.startLine, this.startColumn, line, column);
+            this.control = false;
+            updateTurn();
         }
     }
 
-    // Define the background color for each square
-    Color background(int line, int column){
-        if(model.isBlackTile(new Position(line, column))){
-            return StandardColor.GRAY;
+    private Color background(int line, int column){
+        if(model.isBlackTile(line, column)){
+            return StandardColor.BLACK;
+        } else if (!model.isBlackTile(line, column)){
+            return StandardColor.WHITE;
         }
-        return StandardColor.WHITE;
+        return null;
     }
 
-    // Update the turn message on the board
-    public void updateTurn() {
-        String turnMessage = model.isBlackTurn() ? "Black's Turn" : "White's Turn";
-        board.setTitle(turnMessage);
+    void newBoard(){
+        View gui = new View(new Game());
+        gui.start();
     }
 
-    // Initialize the board with random placement
-    private void random() {
-        model.initializeBoard();
-        updateTurn();
-        board.refresh();
+    void saveStatus(){
+
     }
 
-    // Create a new empty board
-    private void newBoard() {
+    void loadStatus(){
+
+    }
+
+    void random(){
+
+    }
+
+    void start(){
+        board.open();
         model.getEmptyBoard();
-        updateTurn();
-        board.refresh();
+        model.initializeBoard();
     }
 
-    // Save the current game state (placeholder, not implemented)
-    private void saveStatus() {
-        // implement logic to save game state
-    }
-
-    // Load a previously saved game state (placeholder, not implemented)
-    private void loadStatus() {
-        // implement logic to load game state
-    }
-
-    private boolean control = false;
-    Position startPosition;
-    // Handle user clicks on the board
-    private void click(int line, int column) {
-        Position position = new Position(line, column);
-        if (!this.control) {
-            // Player selects a piece
-            if (model.isBlackTurn() && model.board[position.line()][position.column()] == Game.BLACK) { // Black's turn
-                this.control = true;
-                startPosition = position;
-            } else if (!model.isBlackTurn() && model.board[position.line()][position.column()] == Game.WHITE) { // White's turn
-                this.control = true;
-                startPosition = position;
-            }
-        } else {
-            // Player attempts to move the selected piece
-            if (model.isValidMove(startPosition, position)) {
-                model.movePiece(startPosition, position); // Move the piece
-                model.changeTurn(); // Change turn only if the move was valid
-                updateTurn(); // Update the turn message
-                this.control = false; // Reset control
-            } else {
-                this.control = false;
-            }
-        }
+    public static void main(String[] args) {
+        View gui = new View(new Game());
+        gui.start();
     }
 }
