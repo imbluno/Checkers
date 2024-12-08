@@ -110,9 +110,11 @@ public class View {
     public void saveStatus() {
         try (FileWriter writer = new FileWriter("game_status.txt")) { //
             writer.write(Game.getBoardSize() + "\n"); // escreve o tamanho do tabuleiro na primeira linha
+            writer.write(Game.getPieceAmount() + "\n"); // escreve o número de peças iniciais
+            int currentPlayerTurn = model.isBlackTurn() ? 0 : 1; // 0 vez das pretas, 1 vez das brancas
+            writer.write(currentPlayerTurn + "\n"); // guarda a vez do jogador que jogaria a seguir
             for (int i = 0; i < Game.getBoardSize(); i++) {
                 for (int j = 0; j < Game.getBoardSize(); j++) {
-                    // Save the board values
                     if (model.isEmptyTile(i, j)) {
                         writer.write("0 ");  // posição vazia
                     } else if (model.hasBlackPiece(i, j)) {
@@ -133,54 +135,48 @@ public class View {
 
     public void loadStatus() {
         File file = new File("game_status.txt");
+
         if (!file.exists()) {
             sendMessage("Não foi encontrado nenhum jogo.");
             return;
         }
+
         Game newGame = null;
-        try (Scanner scanner = new Scanner(new File(String.valueOf(file)))) {
-            if (!scanner.hasNextInt()) { // verifica se a primeira linha do ficheiro tem o tamanho do tabuleiro
-                sendMessage("Ficheiro inválido.");
-                return;
-            }
 
+        try (Scanner scanner = new Scanner(file)) {
+            int loadedBoardSize = scanner.nextInt(); // 1.ª linha - tamanho do tabuleiro
+            scanner.nextLine();
 
-            int loadedBoardSize = scanner.nextInt(); // define o tamanho do tabuleiro através do valor na primeira linha
-            scanner.nextLine(); // move para a linha seguinte
+            int loadedPieceAmount = scanner.nextInt(); // 2.ª linha - número de peças inicial
+            scanner.nextLine();
 
-            newGame = new Game(loadedBoardSize, 0); // cria um jogo sem peças, com o tamanho definido na primeira linha
+            int loadedTurnInt = scanner.nextInt(); // 3.ª linha - vez do jogador, 0 para pretas e 1 para brancas
+            scanner.nextLine();
+            boolean loadedTurn = loadedTurnInt == 0;
+
+            int[][] loadedBoard = new int[loadedBoardSize][loadedBoardSize]; // matriz para guardar os valores das peças no tabuleiro
 
             for (int i = 0; i < loadedBoardSize; i++) {
                 for (int j = 0; j < loadedBoardSize; j++) {
-                    String cell = scanner.next();  // Read the cell value as a string
-
-                    if (cell.equals("0")) {
-                        newGame.board[i][j] = Game.EMPTY;  // casa preta vazia
-                    } else if (cell.equals("1")) {
-                        newGame.board[i][j] = Game.BLACK;  // peça preta
-                    } else if (cell.equals("2")) {
-                        newGame.board[i][j] = Game.WHITE;  // peça branca
-                    } else if (cell.equals("_")) {
-                        newGame.board[i][j] = Game.EMPTY;  // casa branca
-                    } else {
-                        sendMessage("Dados inválidos.");
-                        return;
+                    if (scanner.hasNextInt()) {
+                        loadedBoard[i][j] = scanner.nextInt(); // lê cada posição
                     }
                 }
             }
+
+            newGame = new Game(loadedBoardSize, loadedPieceAmount, loadedTurn, loadedBoard); // cria um jogo para ser chamado pelo construtor especial para load
+
             sendMessage("Jogo carregado.");
-
         } catch (IOException e) {
-            sendMessage("Erro: " + e.getMessage());
+            sendMessage("Erro ao carregar: " + e.getMessage());
         } catch (Exception e) {
-            sendMessage("Erro inesperado.");
+            sendMessage("Erro inesperado ao carregar.");
         }
-
-        View gui = new View(newGame);
-        gui.start();
+        if (newGame != null) {
+            System.out.println("Game initialized with loaded data.");
+            new View(newGame).board.open(); // abre o jogo numa nova janela
+        }
     }
-
-
 
     public void random() {
         int[][] validMoves = new int[Game.getBoardSize() * Game.getBoardSize() / 2][4]; // matriz com os movimentos válidos, dependendo do tamanho do tabuleiro
@@ -190,7 +186,6 @@ public class View {
             for (int startColumn = 0; startColumn < Game.getBoardSize(); startColumn++) {
                 if ((model.isBlackTurn() && model.board[startLine][startColumn] == Game.BLACK) || // valida a peça e o jogador
                         (!model.isBlackTurn() && model.board[startLine][startColumn] == Game.WHITE)) {
-
                     for (int endLine = 0; endLine < Game.getBoardSize(); endLine++) { // percorre o tabuleiro à procura de posições finais
                         for (int endColumn = 0; endColumn < Game.getBoardSize(); endColumn++) {
                             if (model.isValidMove(startLine, startColumn, endLine, endColumn)) { // valida que a jogada é possível

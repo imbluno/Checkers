@@ -9,18 +9,29 @@ public class Game {
 
     public int[][] board; // criação de matriz com as posições no tabuleiro de jogo
 
-    public Game() {
+    public Game() { // construtor default
         this(8,12); // inicia o jogo com um tabuleiro 8x8 com 12 peças
     }
 
-    public Game(int boardSize, int pieceAmount) {
+    public Game(int boardSize, int pieceAmount) { // construtor para new game
         Game.boardSize = boardSize; // define o tamanho do tabuleiro
         Game.pieceAmount = pieceAmount; // define o número de peças
         this.board = new int[boardSize][boardSize]; // cria o matriz tabuleiro
     }
 
+    public Game(int boardSize, int pieceAmount, boolean turn, int[][] board) { // construtor para load game
+        Game.boardSize = boardSize; // define o tamanho do tabuleiro
+        Game.pieceAmount = pieceAmount; // define o número de peças
+        this.board = board; // define o tabuleiro vindo do load
+        this.blackTurn = turn; // define a vez
+    }
+
     public static int getBoardSize(){
         return boardSize;
+    }
+
+    public static int getPieceAmount(){
+        return pieceAmount;
     }
 
     public void getEmptyBoard() {
@@ -65,6 +76,7 @@ public class Game {
     public boolean isBlackTurn(){
         return this.blackTurn;
     }
+
 
     public void changeTurn () {
         this.blackTurn = !this.blackTurn;
