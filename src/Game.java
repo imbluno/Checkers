@@ -87,15 +87,36 @@ public class Game {
     }
 
     public boolean isEmptyTile(int line, int column) {
+        if (line < 0 || line >= board.length || column < 0 || column >= board[line].length) { // garante que a casa está dentro do tabuleiro
+            return false;
+        }
         return board[line][column] == EMPTY;
     }
 
-    public boolean hasWhitePiece(int line, int column){
+    public boolean hasWhitePiece(int line, int column) {
+        if (line < 0 || line >= board.length || column < 0 || column >= board[line].length) { // garante que a casa está dentro do tabuleiro
+            return false;
+        }
         return board[line][column] == WHITE;
     }
 
-    public boolean hasBlackPiece(int line, int column){
+    public boolean hasBlackPiece(int line, int column) {
+        if (line < 0 || line >= board.length || column < 0 || column >= board[line].length) { // garante que a casa está dentro do tabuleiro
+            return false;
+        }
         return board[line][column] == BLACK;
+    }
+
+    public int[] countPieces() { // contador de peças de cada jogador
+        int blackCount = 0;
+        int whiteCount = 0;
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                if (board[i][j] == BLACK) blackCount++;
+                else if (board[i][j] == WHITE) whiteCount++;
+            }
+        }
+        return new int[] {blackCount, whiteCount};
     }
 
     public static boolean isValidPosition(int line, int column){
@@ -198,4 +219,40 @@ public class Game {
         }
         changeTurn();
     }
+
+    public boolean hasValidMoves() {
+        if (isBlackTurn()) { // verifica se as peças pretas podem jogar
+            return canMove(BLACK);
+        }
+        else { // verifica se as peças pretas podem jogar
+            return canMove(WHITE);
+        }
+    }
+
+    public boolean canMove(int player) {
+        for (int line = 0; line < board.length; line++) {
+            for (int column = 0; column < board[line].length; column++) {
+                if (board[line][column] == player) { // valida que a peça na posição é do jogador
+                    for (int diagonalLine = -1; diagonalLine <= 1; diagonalLine += 2) { // verifica para ambas as peças, pretas e brancas (linha abaixo e linha acima)
+                        for (int diagonalColumn = -1; diagonalColumn <= 1; diagonalColumn += 2) { // verifica para as diagonais à esquerda e à direita
+                            int newLine = line + diagonalLine;
+                            int newColumn = column + diagonalColumn;
+
+                            if (isValidMove(line, column, newLine, newColumn)) { // verifica se existe movimento normal válido
+                                return true;
+                            }
+                            int captureLine = line + 2 * diagonalLine;
+                            int captureCol = column + 2 * diagonalColumn;
+
+                            if (isCaptureMove(line, column, captureLine, captureCol)) { // verifica se existe movimento de captura
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false; // se não existir movimento, retorna falso e o jogo acaba
+    }
+
 }

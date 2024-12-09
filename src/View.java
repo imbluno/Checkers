@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class View {
 
-    Game model;
+    static Game model;
     Board board;
 
     private int startLine = 0;
@@ -17,7 +17,7 @@ public class View {
 
 
     View(Game model){
-        this.model = model;
+        View.model = model;
         board = new Board(getTurn(), Game.getBoardSize(), Game.getBoardSize(), 50);
         board.setIconProvider(this::icon);
         board.addMouseListener(this::click);
@@ -34,14 +34,16 @@ public class View {
     }
 
     String icon(int line, int column){
-        if(model.board[line][column] == Game.WHITE){
-            return "white.png";
-        } else if(model.board[line][column] == Game.BLACK){
-            return "black.png";
-        } else {
-            return null;
+        if (line >= 0 && line < Game.getBoardSize() && column >= 0 && column < Game.getBoardSize()){ // valida que só serão preenchidas casas dentro do tabuleiro, prevenindo erros
+            if(model.board[line][column] == Game.WHITE){
+                return "white.png";
+            } else if(model.board[line][column] == Game.BLACK){
+                return "black.png";
+            }
         }
+            return null;
     }
+
     private boolean control = false;
 
     public void updateTurn() {
@@ -56,6 +58,7 @@ public class View {
     }
 
     private void click(int line, int column) {
+        checkEndGame(); // verifica se o jogo acabou antes de mover a peça
         // valida se existe peça do jogador e se é a vez dele
         if (!this.control) {
             if ((model.isBlackTurn() && model.board[line][column] == Game.BLACK) || // se for uma peça preta na vez das peças pretas
@@ -81,6 +84,7 @@ public class View {
             if (model.isValidMove(startLine, startColumn, line, column)) { // valida o movimento
                 model.movePiece(startLine, startColumn, line, column); // move a peça
                 updateTurn(); // passa a vez ao oponente
+                checkEndGame(); // verifica se o jogo acabou
                 this.control = false; // reseta a variável de controlo
             }
         }
@@ -173,12 +177,13 @@ public class View {
             sendMessage("Erro inesperado ao carregar.");
         }
         if (newGame != null) {
-            System.out.println("Game initialized with loaded data.");
-            new View(newGame).board.open(); // abre o jogo numa nova janela
+            new View(newGame); // cria uma view com o tabuleiro carregado
+            board.open(); // abre o jogo numa nova janela
         }
     }
 
     public void random() {
+        checkEndGame(); // verifica se o jogo acabou antes de mover a peça
         int[][] validMoves = new int[Game.getBoardSize() * Game.getBoardSize() / 2][4]; // matriz com os movimentos válidos, dependendo do tamanho do tabuleiro
         int validMoveCount = 0;
 
@@ -189,12 +194,12 @@ public class View {
                     for (int endLine = 0; endLine < Game.getBoardSize(); endLine++) { // percorre o tabuleiro à procura de posições finais
                         for (int endColumn = 0; endColumn < Game.getBoardSize(); endColumn++) {
                             if (model.isValidMove(startLine, startColumn, endLine, endColumn)) { // valida que a jogada é possível
-                                // guarda a jogada numa matriz
+                                // guarda a jogada numa matriz, na linha validMoveCount
                                 validMoves[validMoveCount][0] = startLine;
                                 validMoves[validMoveCount][1] = startColumn;
                                 validMoves[validMoveCount][2] = endLine;
                                 validMoves[validMoveCount][3] = endColumn;
-                                validMoveCount++;
+                                validMoveCount++; // incrementa a variável indicando que existe mais uma jogada válida
                             }
                         }
                     }
@@ -202,17 +207,27 @@ public class View {
             }
         }
 
-        // escolhe uma jogada aleatoriamente
-        if (validMoveCount > 0) {
+        if (validMoveCount > 0) {  // escolhe uma jogada aleatoriamente se existir uma jogada válida
             int randomIndex = (int) (Math.random() * validMoveCount);
+            // acede à posição randomIndex do matriz, colocando cada uma das posições da linha numa variável, para passar à função de movimento
             int startLine = validMoves[randomIndex][0];
             int startColumn = validMoves[randomIndex][1];
             int endLine = validMoves[randomIndex][2];
             int endColumn = validMoves[randomIndex][3];
-
-            // move a peça
-            model.movePiece(startLine, startColumn, endLine, endColumn);
+            model.movePiece(startLine, startColumn, endLine, endColumn);// move a peça
             updateTurn(); // passa a vez
+
+        }
+    }
+
+    public void checkEndGame() {
+        int[] counts = model.countPieces(); // chama a função que retorna a contagem das peças de cada jogador
+        if (counts[0] == 0) sendMessage("Peças brancas venceram!"); // se não houver peças pretas - posição 0 do array são peças pretas
+        else if (counts[1] == 0) sendMessage("Peças pretas venceram!"); // se não houver peças brancas - posição 1 do array são peças brancas
+        else if (!model.hasValidMoves()) { // se não houver mais movimentos
+            if (counts[0] > counts[1]) sendMessage("Peças pretas venceram!"); // se houver mais peças pretas
+            else if (counts[1] > counts[0]) sendMessage("Peças brancas venceram!"); // se houver mais peças brancas
+            else sendMessage("Empate!"); // se forem em igual número
         }
     }
 
