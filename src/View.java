@@ -29,11 +29,15 @@ public class View {
         board.refresh();
     }
 
-    public void sendMessage(String message){
+    public void sendMessage(String message){ // função auxiliar para enviar mensagens popup
         board.showMessage(message);
     }
 
-    String icon(int line, int column){
+    private Color background(int line, int column){ // função para "pintar" o tabuleiro
+        return model.isBlackTile(line, column) ? StandardColor.BLACK : StandardColor.WHITE; // valida se a casa de jogo é preta e coloca a cor correta em ambos os casos
+    }
+
+    String icon(int line, int column){ // função para preencher o tabuleiro com peças pretas ou brancas
         if (line >= 0 && line < Game.getBoardSize() && column >= 0 && column < Game.getBoardSize()){ // valida que só serão preenchidas casas dentro do tabuleiro, prevenindo erros
             if(model.board[line][column] == Game.WHITE){
                 return "white.png";
@@ -57,7 +61,7 @@ public class View {
         }
     }
 
-    private void click(int line, int column) {
+    private void click(int line, int column) { // função que atua quando existe um click do rato
         checkEndGame(); // verifica se o jogo acabou antes de mover a peça
         // valida se existe peça do jogador e se é a vez dele
         if (!this.control) {
@@ -90,11 +94,7 @@ public class View {
         }
     }
 
-    private Color background(int line, int column){
-        return model.isBlackTile(line, column) ? StandardColor.BLACK : StandardColor.WHITE; // valida se a casa de jogo é preta e coloca a cor correta em ambos os casos
-    }
-
-    void newBoard(){
+    public void newBoard(){
         int userBoardSize = board.promptInt("Introduz o tamanho do tabuleiro:");
         if (userBoardSize <= 0){
             board.promptText("Tamanho inválido, introduz novamente.");
